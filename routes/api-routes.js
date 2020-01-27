@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Workout = require("../models").Workout;
+const db = require("../models");
 
 router.get("/api/workouts", function (req, res) {
     Workout.find({})
