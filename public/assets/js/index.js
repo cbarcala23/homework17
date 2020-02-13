@@ -12,7 +12,7 @@ const distanceInput = document.querySelector("#distance");
 const completeButton = document.querySelector("button.complete");
 const addButton = document.querySelector("button.add-another");
 const toast = document.querySelector("#toast");
-const newWorkout = document.querySelector(".new-workout")
+const newWorkout = document.querySelector(".new-workout");
 
 let workoutType = null;
 let shouldNavigateAway = false;
@@ -20,13 +20,15 @@ let shouldNavigateAway = false;
 init();
 
 async function init() {
-  if (location.search.split("=")[1] === undefined) {
+  if (
+    location.search.split("=")[1] === undefined &&
+    location.pathname !== "/exercise"
+  ) {
     const workout = await API.getLastWorkout();
-    if(workout) {
+    if (workout) {
       location.search = "?id=" + workout._id;
-    }
-    else {
-      newWorkout.classList.add("")
+    } else {
+      // newWorkout.classList.add("");
     }
   }
 }
@@ -113,7 +115,10 @@ async function handleFormSubmit(event) {
     workoutData.duration = Number(resistanceDurationInput.value.trim());
   }
 
-  await API.addExercise(workoutData);
+  let addedExercise = await API.addExercise(workoutData);
+  if (!shouldNavigateAway) {
+    location.search = `?id=${addedExercise._id}`;
+  }
   clearInputs();
   toast.classList.add("success");
 }
@@ -136,16 +141,16 @@ function clearInputs() {
   weightInput.value = "";
 }
 
-if(workoutTypeSelect) {
+if (workoutTypeSelect) {
   workoutTypeSelect.addEventListener("change", handleWorkoutTypeChange);
 }
-if(completeButton) {
+if (completeButton) {
   completeButton.addEventListener("click", function(event) {
     shouldNavigateAway = true;
     handleFormSubmit(event);
   });
 }
-if(addButton) {
+if (addButton) {
   addButton.addEventListener("click", handleFormSubmit);
 }
 toast.addEventListener("animationend", handleToastAnimationEnd);
